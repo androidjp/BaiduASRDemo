@@ -40,7 +40,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mPresenter = new MainPresenter(this,this);
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        sp.edit().remove(Constant.EXTRA_INFILE).commit(); // infile参数用于控制识别一个PCM音频流（或文件），每次进入程序都将该值清楚，以避免体验时没有使用录音的问题
+        sp.edit().putBoolean("api", true).apply();
+        sp.edit().remove(Constant.EXTRA_INFILE).apply(); // infile参数用于控制识别一个PCM音频流（或文件），每次进入程序都将该值清楚，以避免体验时没有使用录音的问题
 
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -74,6 +75,11 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void showBtnText(String text){
         this.btnSpeech.setText(text);
+        if (!text.equals("开始")){
+            rippleBackground.startRippleAnimation();
+        }else{
+            rippleBackground.stopRippleAnimation();
+        }
     }
 
 
