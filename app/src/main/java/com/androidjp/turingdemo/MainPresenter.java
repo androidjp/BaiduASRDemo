@@ -7,12 +7,16 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.RecognitionListener;
 import android.speech.SpeechRecognizer;
+import android.util.Log;
 
 import com.androidjp.lib_baidu_asr.BaiduASR;
 import com.baidu.speech.VoiceRecognitionService;
 
+import org.json.JSONObject;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static android.os.MessageQueue.OnFileDescriptorEventListener.EVENT_ERROR;
 import static com.androidjp.lib_baidu_asr.asr.ASRStatus.STATUS_None;
@@ -34,6 +38,7 @@ public class MainPresenter implements MainContract.Presenter, RecognitionListene
     private int status = STATUS_None;
     private long time;
     private long speechEndTime = -1;
+    private static final int EVENT_ERROR = 11;
 
     public MainPresenter(Context context, MainContract.View view) {
         mContext = context;
@@ -62,37 +67,38 @@ public class MainPresenter implements MainContract.Presenter, RecognitionListene
     public void toggleYuYin() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
         boolean api = sp.getBoolean("api", false);
+        Log.i("MainPresenter","toggleYuYin() --> SharedPreferences 可读");
         if (api) {
             switch (status) {
                 case STATUS_None:
                     startYuYin();
                     status = STATUS_WaitingReady;
                     if (mView !=null)
-                        mView.get().showText("取消");
+                        mView.get().showBtnText("取消");
                     break;
                 case STATUS_WaitingReady:
                     cancelYuYin();
                     status = STATUS_None;
                     if (mView !=null)
-                        mView.get().showText("开始");
+                        mView.get().showBtnText("开始");
                     break;
                 case STATUS_Ready:
                     cancelYuYin();
                     status = STATUS_None;
                     if (mView !=null)
-                        mView.get().showText("开始");
+                        mView.get().showBtnText("开始");
                     break;
                 case STATUS_Speaking:
                     stopAndDeal();
                     status = STATUS_Recognition;
                     if (mView !=null)
-                        mView.get().showText("识别中");
+                        mView.get().showBtnText("识别中");
                     break;
                 case STATUS_Recognition:
                     cancelYuYin();
                     status = STATUS_None;
                     if (mView !=null)
-                        mView.get().showText("开始");
+                        mView.get().showBtnText("开始");
                     break;
             }
         } else {
@@ -102,7 +108,7 @@ public class MainPresenter implements MainContract.Presenter, RecognitionListene
 
     @Override
     public void getIntentBundle(Bundle bundle) {
-
+        onResults(bundle);
     }
 
 
@@ -112,14 +118,14 @@ public class MainPresenter implements MainContract.Presenter, RecognitionListene
     @Override
     public void onReadyForSpeech(Bundle params) {
         status = STATUS_Ready;
+        Log.d("onReadyForSpeech()","准备就绪，可以开始说话");
     }
 
     @Override
     public void onBeginningOfSpeech() {
         time = System.currentTimeMillis();
         status = STATUS_Speaking;
-
-
+        Log.d("onBeginningOfSpeech()","检测到用户的已经开始说话");
     }
 
     @Override
@@ -136,6 +142,7 @@ public class MainPresenter implements MainContract.Presenter, RecognitionListene
     public void onEndOfSpeech() {
         speechEndTime = System.currentTimeMillis();
         status = STATUS_Recognition;
+        Log.d("onEndOfSpeech()","检测到用户的已经停止说话");
         mView.get().showBtnText("识别中");
     }
 
@@ -174,7 +181,7 @@ public class MainPresenter implements MainContract.Presenter, RecognitionListene
                 break;
         }
         sb.append(":" + error);
-//        print("识别失败：" + sb.toString());
+        Log.e("MainPresenter.onError()","识别失败：" + sb.toString());
         mView.get().showBtnText("开始");
     }
 
@@ -183,13 +190,13 @@ public class MainPresenter implements MainContract.Presenter, RecognitionListene
         long end2finish = System.currentTimeMillis() - speechEndTime;
         status = STATUS_None;
         ArrayList<String> nbest = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-//        print("识别成功：" + Arrays.toString(nbest.toArray(new String[nbest.size()])));
+        Log.d("onResults()","识别成功：" + Arrays.toString(nbest.toArray(new String[nbest.size()])));
         String json_res = results.getString("origin_result");
-//        try {
-//            print("origin_result=\n" + new JSONObject(json_res).toString(4));
-//        } catch (Exception e) {
-//            print("origin_result=[warning: bad json]\n" + json_res);
-//        }
+        try {
+            Log.d("onResults()","origin_result=\n" + new JSONObject(json_res).toString(4));
+        } catch (Exception e) {
+            Log.d("onResults()","origin_result=[warning: bad json]\n" + json_res);
+        }
         mView.get().showBtnText("开始");
         String strEnd2Finish = "";
         if (end2finish < 60 * 1000) {
@@ -203,7 +210,7 @@ public class MainPresenter implements MainContract.Presenter, RecognitionListene
     public void onPartialResults(Bundle partialResults) {
         ArrayList<String> nbest = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         if (nbest.size() > 0) {
-//            print("~临时识别结果：" + Arrays.toString(nbest.toArray(new String[0])));
+            Log.d("onPartialResults()","~临时识别结果：" + Arrays.toString(nbest.toArray(new String[0])));
             mView.get().showText(nbest.get(0));
         }
     }
@@ -213,11 +220,11 @@ public class MainPresenter implements MainContract.Presenter, RecognitionListene
         switch (eventType) {
             case EVENT_ERROR:
                 String reason = params.get("reason") + "";
-//                print("EVENT_ERROR, " + reason);
+                Log.e("MainPresenter.onEvent()","EVENT_ERROR, " + reason);
                 break;
             case VoiceRecognitionService.EVENT_ENGINE_SWITCH:
                 int type = params.getInt("engine_type");
-//                print("*引擎切换至" + (type == 0 ? "在线" : "离线"));
+                Log.d("MainPresenter.onEvent()","*引擎切换至" + (type == 0 ? "在线" : "离线"));
                 break;
         }
     }

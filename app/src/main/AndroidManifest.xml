@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <!--end: 百度ASR （automatic speech recognize）相关依赖-->
 
     <application
@@ -20,30 +21,41 @@
         android:theme="@style/AppTheme">
 
         <!--baidu ASR sdk-->
-        <meta-data android:name="com.baidu.speech.APP_ID" android:value=""/>
-        <meta-data android:name="com.baidu.speech.APP_KEY" android:value=""/>
-        <meta-data android:name="com.baidu.speech.SECRET_KEY" android:value=""/>
-        <service android:name="com.baidu.speech.VoiceRecognitionService" android:exported="false"/>
-        <activity android:name="com.baidu.voicerecognition.android.ui.BaiduASRDigitalDialog"
+        <meta-data android:name="com.baidu.speech.APP_ID" android:value="9297985"/>
+        <meta-data android:name="com.baidu.speech.API_KEY" android:value="5GxfmwQZrFCHqxmv4HEnFrm7"/>
+        <meta-data android:name="com.baidu.speech.SECRET_KEY" android:value="b9ad7e90670428a546e31aa3941da261"/>
+        <service android:name="com.baidu.speech.VoiceRecognitionService" android:exported="false" />
+        <activity
+            android:name="com.baidu.voicerecognition.android.ui.BaiduASRDigitalDialog"
             android:configChanges="orientation|keyboardHidden|screenLayout"
             android:theme="@android:style/Theme.Dialog"
             android:exported="false"
-            android:screenOrientation="portrait"
-            >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.baidu.action.RECOGNIZE_SPEECH" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <!--end: baidu ASR sdk-->
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:configChanges="orientation|keyboardHidden|screenLayout"
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".DemoActivity"
+            android:configChanges="orientation|keyboardHidden|screenLayout"
+            android:screenOrientation="portrait"
+            >
+        </activity>
+
+
     </application>
 
 </manifest>

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.speech.RecognitionListener;
+import android.util.Log;
 
 import com.androidjp.lib_baidu_asr.asr.ASRManager;
 
@@ -20,11 +21,13 @@ import com.androidjp.lib_baidu_asr.asr.ASRManager;
  */
 
 public class BaiduASR {
+    private static final String TAG = "BaiduASR";
     /**
      * 打开 语音识别的相关设置界面
      * @param context 上下文（Activity）
      */
     public static void openSettings(Context context){
+        Log.i(TAG, "openSettings()");
         Intent intent = new Intent("com.baidu.speech.asr.demo.setting");
         context.startActivity(intent);
     }
@@ -35,6 +38,7 @@ public class BaiduASR {
      * @param listener 回调
      */
     public static void startASR(Activity activity, RecognitionListener listener){
+        Log.i(TAG, "startASR()");
         ASRManager.getInstance().init(activity,listener)
                 .start();
     }
@@ -43,6 +47,7 @@ public class BaiduASR {
      * 停止语音录入
      */
     public static void stopASR(){
+        Log.i(TAG, "stopASR()");
         ASRManager.getInstance().stop();
     }
 
@@ -50,6 +55,7 @@ public class BaiduASR {
      * 取消语音识别
      */
     public static void cancelASR(){
+        Log.i(TAG, "cancelASR()");
         ASRManager.getInstance().cancel();
     }
 
@@ -57,6 +63,7 @@ public class BaiduASR {
      * 销毁相关对象
      */
     public static void release(){
+        Log.i(TAG, "release()");
         ASRManager.getInstance().release();
     }
 

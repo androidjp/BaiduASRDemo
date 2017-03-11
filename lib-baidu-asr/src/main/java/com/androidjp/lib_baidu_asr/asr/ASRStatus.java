@@ -10,4 +10,5 @@ public class ASRStatus {
     public static final int STATUS_Ready = 3;
     public static final int STATUS_Speaking = 4;
     public static final int STATUS_Recognition = 5;
+
 }

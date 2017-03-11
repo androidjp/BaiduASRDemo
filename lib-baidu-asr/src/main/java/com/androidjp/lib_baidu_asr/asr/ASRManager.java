@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.speech.RecognitionListener;
 import android.speech.SpeechRecognizer;
+import android.util.Log;
 
 import com.androidjp.lib_baidu_asr.R;
 import com.androidjp.lib_baidu_asr.data.Constant;
@@ -24,6 +25,8 @@ import java.lang.ref.WeakReference;
  */
 
 public class ASRManager {
+
+    private static final String TAG = "ASRManager";
     ///被封装的SpeechRecognizer对象
     private SpeechRecognizer speechRecognizer;
     private Intent intent;
@@ -33,7 +36,6 @@ public class ASRManager {
     private static final int REQUEST_UI = 1;
 
     private long speechEndTime = -1;
-    private static final int EVENT_ERROR = 11;
 
     private static class SingletonHolder {
         private static final ASRManager sInstance = new ASRManager();
@@ -45,6 +47,7 @@ public class ASRManager {
 
     //------------------------------
     public ASRManager init(Activity context, RecognitionListener recognitionListener) {
+        Log.i(TAG, "init()");
         ///创建
         refContext = new WeakReference<Activity>(context);
         if (refContext.get() == null)
@@ -52,6 +55,7 @@ public class ASRManager {
         this.speechRecognizer = SpeechRecognizer.createSpeechRecognizer(refContext.get(), new ComponentName(refContext.get(), VoiceRecognitionService.class));
         if (recognitionListener != null)
             this.speechRecognizer.setRecognitionListener(recognitionListener);
+        Log.i(TAG, "init() finished!!");
         return this;
     }
 
@@ -146,6 +150,7 @@ public class ASRManager {
 
 
     public void start() {
+        Log.i(TAG, "start()");
         if (refContext.get() == null)
             return;
         Intent intent = new Intent();
@@ -167,26 +172,36 @@ public class ASRManager {
             intent.setAction("com.baidu.action.RECOGNIZE_SPEECH");
             refContext.get().startActivityForResult(intent, REQUEST_UI);
         }
+        Log.i(TAG, "start() finished!!");
 
 //        txtResult.setText("");
     }
 
 
     public void stop() {
+        Log.i(TAG, "stop()");
         if (speechRecognizer == null) return;
         speechRecognizer.stopListening();
 //        print("点击了“说完了”");
+        Log.i(TAG, "stop() finished!!");
+
     }
 
     public void cancel() {
+        Log.i(TAG, "cancel()");
         if (speechRecognizer == null) return;
         speechRecognizer.cancel();
 //        print("点击了“取消”");
+        Log.i(TAG, "cancel() finished!!");
+
     }
 
     public void release() {
+        Log.i(TAG, "release()");
         if (speechRecognizer == null) return;
         speechRecognizer.destroy();
+        Log.i(TAG, "release() finished!!");
+
     }
 
 }
