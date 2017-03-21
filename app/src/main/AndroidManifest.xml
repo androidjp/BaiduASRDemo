@@ -37,6 +37,7 @@
             </intent-filter>
         </activity>
 
+
         <!--end: baidu ASR sdk-->
 
         <activity android:name=".MainActivity"
@@ -54,6 +55,8 @@
             android:screenOrientation="portrait"
             >
         </activity>
+
+
 
 
     </application>
